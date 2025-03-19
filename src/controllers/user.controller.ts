@@ -1,10 +1,10 @@
 import { Response, Request } from 'express'
-import { getUser, loginUser, registerUser } from '../services/user.service'
+import { getUserService, loginUserService, registerUserService } from '../services/user.service'
 
-export const register = async (req: Request, res: Response) => {
+export const registerController = async (req: Request, res: Response) => {
     try {
         const { name, email, password } = req.body
-        const user = await registerUser(name, email, password)
+        const user = await registerUserService(name, email, password)
         res.status(201).json({ message: 'User registered successfully', user })
         //eslint-disable-next-line
     } catch (error: any) {
@@ -12,10 +12,10 @@ export const register = async (req: Request, res: Response) => {
     }
 }
 
-export const login = async (req: Request, res: Response) => {
+export const loginController = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body
-        const result = await loginUser(email, password)
+        const result = await loginUserService(email, password)
         res.status(200).json(result)
         //eslint-disable-next-line
     } catch (error: any) {
@@ -23,10 +23,10 @@ export const login = async (req: Request, res: Response) => {
     }
 }
 
-export const me = async (req: Request, res: Response) => {
+export const meController = async (req: Request, res: Response) => {
     try {
         const id = req.user.id
-        const user = await getUser(id)
+        const user = await getUserService(id)
         res.status(200).json(user)
         //eslint-disable-next-line
     } catch (error: any) {

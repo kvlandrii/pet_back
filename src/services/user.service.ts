@@ -1,19 +1,19 @@
 import bcrypt from 'bcrypt'
-import { User } from '../models/user.model'
 import jwt from 'jsonwebtoken'
 import { config } from '../config/env'
 import { Conflict } from 'http-errors'
+import { getUserByEmail, getUserById, registerUser } from '../repository/user.repository'
 
-export const registerUser = async (name: string, email: string, password: string) => {
-    const user = await User.findOne({ email })
+export const registerUserService = async (name: string, email: string, password: string) => {
+    const user = await getUserByEmail(email)
     if (user) throw new Conflict('User already exists')
 
     const hashedPassword = await bcrypt.hash(password, 10)
-    return await User.create({ name, email, password: hashedPassword })
+    return await registerUser(name, email, hashedPassword)
 }
 
-export const loginUser = async (email: string, password: string) => {
-    const user = await User.findOne({ email })
+export const loginUserService = async (email: string, password: string) => {
+    const user = await getUserByEmail(email)
     if (!user) throw new Error('User not found')
 
     const isMatch = await bcrypt.compare(password, user.password)
@@ -25,8 +25,8 @@ export const loginUser = async (email: string, password: string) => {
     return { user, token }
 }
 
-export const getUser = async (id: string) => {
-    const user = await User.findById(id)
+export const getUserService = async (id: string) => {
+    const user = await getUserById(id)
     if (!user) throw new Error('User not found')
     return user
 }
