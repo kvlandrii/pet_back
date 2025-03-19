@@ -1,6 +1,8 @@
 import { Server } from 'socket.io'
 import { config } from './config/env'
 import { createMessageService, deleteMessageService, getMessagesService, updateMessageService } from './services/messages.service'
+import { verifyToken } from './utils/token'
+import { getUserById } from './repository/user.repository'
 
 // eslint-disable-next-line
 export const socket = (httpServer: any) => {
@@ -13,9 +15,29 @@ export const socket = (httpServer: any) => {
         },
     })
 
+    io.use(async (socket, next) => {
+        try {
+            const token = socket.handshake.auth?.token
+
+            if (!token) {
+                return next(new Error('No token provided'))
+            }
+
+            const decoded = verifyToken(token)
+            const user = await getUserById(decoded.id)
+
+            socket.data.user = user
+
+            next()
+        } catch (err) {
+            next(new Error('Authentication error: ' + err))
+        }
+    })
+
     io.on('connection', (socket) => {
         socket.on('join', async (data) => {
-            const { userId, partnerId } = data
+            const { partnerId } = data
+            const userId = socket.data.user.id
             const roomName = [userId, partnerId].sort().join('-')
 
             socket.join(roomName)
@@ -29,7 +51,8 @@ export const socket = (httpServer: any) => {
         })
 
         socket.on('message', async (data) => {
-            const { roomName, content, senderId } = data
+            const { roomName, content } = data
+            const senderId = socket.data.user.id
 
             try {
                 const newMessage = await createMessageService(content, roomName, senderId)

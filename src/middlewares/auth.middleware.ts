@@ -1,8 +1,7 @@
-import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
-import { config } from '../config/env'
 import { Unauthorized } from 'http-errors'
 import { getUserById } from '../repository/user.repository'
+import { verifyToken } from '../utils/token'
 
 export const authMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization
@@ -16,7 +15,7 @@ export const authMiddleware = async (req: Request, _res: Response, next: NextFun
     }
 
     try {
-        const decoded = jwt.verify(token, config.jwtSecret) as { id: string }
+        const decoded = verifyToken(token)
         const user = await getUserById(decoded.id)
 
         if (!user) {
