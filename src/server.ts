@@ -18,18 +18,17 @@ const io = new Server(httpServer, {
 })
 
 io.on('connection', (socket) => {
-    console.log('New user connected: ', socket.id)
+    socket.on('join', (data) => {
+        const { userId, partnerId } = data
+        const roomName = [userId, partnerId].sort().join('-')
 
-    const roomName = 'global'
-
-    socket.join(roomName)
-
-    socket.on('message', (data) => {
-        io.to(roomName).emit('message', data)
+        socket.join(roomName)
+        socket.emit('joinedRoom', { roomName: roomName })
     })
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected: ', socket.id)
+    socket.on('message', (data) => {
+        const { roomName, message } = data
+        io.to(roomName).emit('message', { message: message })
     })
 })
 
