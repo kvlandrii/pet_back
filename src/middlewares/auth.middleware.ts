@@ -5,29 +5,28 @@ import { Unauthorized } from 'http-errors'
 import { getUserById } from '../repository/user.repository'
 
 export const authMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(' ')[1]
+    const authHeader = req.headers.authorization
+    if (!authHeader) {
+        return next(new Unauthorized('No token provided'))
+    }
 
+    const token = authHeader.split(' ')[1]
     if (!token) {
         return next(new Unauthorized('No token provided'))
     }
 
-    let tokenPayload
+    try {
+        const decoded = jwt.verify(token, config.jwtSecret) as { id: string }
+        const user = await getUserById(decoded.id)
 
-    jwt.verify(token, config.jwtSecret, (err, decoded) => {
-        if (err || !decoded) {
-            return next(new Unauthorized('Invalid token'))
+        if (!user) {
+            return next(new Unauthorized('User not found'))
         }
 
-        tokenPayload = decoded as { id: string }
-    })
-
-    const user = await getUserById(tokenPayload!.id)
-
-    if (!user) {
-        return next(new Unauthorized('User not found'))
+        req.user = user
+        next()
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+        return next(new Unauthorized('Invalid token'))
     }
-
-    req.user = user
-
-    next()
 }

@@ -1,3 +1,4 @@
+import '../plugins/mongoosePlugins'
 import mongoose from 'mongoose'
 
 const todoSchema = new mongoose.Schema({

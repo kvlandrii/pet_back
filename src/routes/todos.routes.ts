@@ -6,7 +6,7 @@ const todosRouter = express.Router()
 
 todosRouter.get('', authMiddleware, getAllTodosController)
 todosRouter.post('/create', authMiddleware, createTodoController)
-todosRouter.delete('/delete', authMiddleware, deleteTodoController)
+todosRouter.delete('/delete/:id', authMiddleware, deleteTodoController)
 todosRouter.put('/update/:id', authMiddleware, updateTodoController)
 
 export default todosRouter

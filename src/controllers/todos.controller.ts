@@ -17,6 +17,9 @@ export const getAllTodosController = async (req: Request, res: Response) => {
     try {
         const { id } = req.user
         const todos = await getAllTodosService(id)
+        if (!todos) {
+            res.status(404).json({ message: 'Todos not found' })
+        }
         res.status(200).json({ message: 'Todos found successfully', todos })
         //eslint-disable-next-line
     } catch (error: any) {
@@ -26,8 +29,11 @@ export const getAllTodosController = async (req: Request, res: Response) => {
 
 export const deleteTodoController = async (req: Request, res: Response) => {
     try {
-        const { id } = req.body
+        const { id } = req.params
         const todo = await deleteTodoService(id)
+        if (!todo) {
+            res.status(404).json({ message: 'Todo not found' })
+        }
         res.status(200).json({ message: 'Todo deleted successfully', todo })
         //eslint-disable-next-line
     } catch (error: any) {
