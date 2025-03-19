@@ -1,5 +1,7 @@
-declare namespace Express {
-  export interface Request {
-    user?: Express.User;
-  }
+import 'express'
+
+declare module 'express-serve-static-core' {
+    export interface Request {
+        user?: Express.User
+    }
 }

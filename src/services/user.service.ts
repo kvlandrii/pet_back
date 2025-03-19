@@ -20,3 +20,9 @@ export const loginUser = async (email: string, password: string) => {
     })
     return { user, token }
 }
+
+export const getUser = async (id: string) => {
+    const user = await User.findById(id)
+    if (!user) throw new Error('User not found')
+    return user
+}

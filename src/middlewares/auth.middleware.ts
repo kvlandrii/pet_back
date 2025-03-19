@@ -1,20 +1,21 @@
-import jwt from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
-import { config } from "../config/env";
+import jwt from 'jsonwebtoken'
+import { Request, Response, NextFunction } from 'express'
+import { config } from '../config/env'
+import { Unauthorized } from 'http-errors'
 
-export const authMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const token = req.header("Authorization")?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
+export const authMiddleware = (req: Request, _res: Response, next: NextFunction) => {
+    const token = req.headers.authorization?.split(' ')[1]
 
-  try {
-    const decoded = jwt.verify(token, config.jwtSecret);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: "Invalid token" });
-  }
-};
+    if (!token) {
+        return next(new Unauthorized('No token provided'))
+    }
+
+    jwt.verify(token, config.jwtSecret, (err, decoded) => {
+        if (err) {
+            return next(new Unauthorized('Invalid token'))
+        }
+
+        req.user = decoded
+        next()
+    })
+}
