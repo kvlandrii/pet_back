@@ -16,3 +16,7 @@ export const deleteTodo = async (id: string) => {
 export const updateTodo = async (id: string, title: string, description: string, completed: boolean) => {
     return await Todo.findByIdAndUpdate(id, { title, description, completed }, { new: true })
 }
+
+export const getTodoById = async (id: string) => {
+    return await Todo.findById(id)
+}
