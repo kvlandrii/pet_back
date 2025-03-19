@@ -1,5 +1,6 @@
 import { Server } from 'socket.io'
 import { config } from './config/env'
+import { createMessageService, getMessagesService } from './services/messages.service'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const socket = (httpServer: any) => {
@@ -13,22 +14,30 @@ export const socket = (httpServer: any) => {
     })
 
     io.on('connection', (socket) => {
-        console.log(`Socket connected: ${socket.id}`)
-
-        socket.on('join', (data) => {
+        socket.on('join', async (data) => {
             const { userId, partnerId } = data
             const roomName = [userId, partnerId].sort().join('-')
+
             socket.join(roomName)
-            socket.emit('joinedRoom', { roomName })
+
+            try {
+                const messages = await getMessagesService(roomName)
+                socket.emit('joinedRoom', { roomName: roomName, messages: messages })
+            } catch (error) {
+                socket.emit('error', { message: error })
+            }
         })
 
-        socket.on('message', (data) => {
-            const { roomName, message } = data
-            io.to(roomName).emit('message', { message })
-        })
-
-        socket.on('disconnect', () => {
-            console.log(`Socket disconnected: ${socket.id}`)
+        socket.on('message', async (data) => {
+            const { roomName, content, senderId } = data
+            try {
+                const newMessage = await createMessageService(content, roomName, senderId)
+                io.to(roomName).emit('message', {
+                    message: newMessage,
+                })
+            } catch (error) {
+                socket.emit('error', { message: error })
+            }
         })
     })
 
