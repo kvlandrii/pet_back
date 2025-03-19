@@ -16,11 +16,11 @@ export const loginUserService = async (email: string, password: string) => {
     const user = await getUserByEmail(email)
     if (!user) throw new Error('User not found')
 
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = await bcrypt.compare(password, user.password as string)
     if (!isMatch) throw new Error('Invalid credentials')
 
     const token = jwt.sign({ id: user._id }, config.jwtSecret, {
-        expiresIn: '1h',
+        expiresIn: '1d',
     })
     return { user, token }
 }

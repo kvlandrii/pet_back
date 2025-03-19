@@ -1,4 +1,3 @@
-import '../plugins/mongoosePlugins'
 import mongoose from 'mongoose'
 
 const userSchema = new mongoose.Schema(
@@ -9,13 +8,12 @@ const userSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
+        versionKey: false,
+        id: true,
         toJSON: {
-            virtuals: true,
-            transform: (_doc, ret) => {
-                ret.id = ret._id.toString()
+            transform(doc, ret) {
+                ret.id = ret._id
                 delete ret._id
-                delete ret.__v
-                return ret
             },
         },
     }
