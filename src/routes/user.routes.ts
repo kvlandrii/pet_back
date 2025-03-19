@@ -6,6 +6,6 @@ const userRouter = express.Router()
 
 userRouter.post('/register', registerController)
 userRouter.post('/login', loginController)
-userRouter.get('/:id', authMiddleware, meController)
+userRouter.get('/me', authMiddleware, meController)
 
 export default userRouter

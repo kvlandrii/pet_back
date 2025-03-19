@@ -31,9 +31,6 @@ export const deleteTodoController = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
         const todo = await deleteTodoService(id)
-        if (!todo) {
-            res.status(404).json({ message: 'Todo not found' })
-        }
         res.status(200).json({ message: 'Todo deleted successfully', todo })
         //eslint-disable-next-line
     } catch (error: any) {
