@@ -17,3 +17,11 @@ export const createMessage = async (message: string, roomName: string, senderId:
     const messageWithSender = { ...newMessage.toJSON(), sender: await User.findById(senderId) }
     return messageWithSender
 }
+
+export const deleteMessage = async (messageId: string) => {
+    return await Messages.deleteOne({ _id: messageId })
+}
+
+export const updateMessage = async (messageId: string, content: string) => {
+    return await Messages.updateOne({ _id: messageId }, { content })
+}

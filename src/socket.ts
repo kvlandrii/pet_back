@@ -1,8 +1,8 @@
 import { Server } from 'socket.io'
 import { config } from './config/env'
-import { createMessageService, getMessagesService } from './services/messages.service'
+import { createMessageService, deleteMessageService, getMessagesService, updateMessageService } from './services/messages.service'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line
 export const socket = (httpServer: any) => {
     const io = new Server(httpServer, {
         cors: {
@@ -30,10 +30,41 @@ export const socket = (httpServer: any) => {
 
         socket.on('message', async (data) => {
             const { roomName, content, senderId } = data
+
             try {
                 const newMessage = await createMessageService(content, roomName, senderId)
                 io.to(roomName).emit('message', {
                     message: newMessage,
+                })
+            } catch (error) {
+                socket.emit('error', { message: error })
+            }
+        })
+
+        socket.on('deleteMessage', async (data) => {
+            const { messageId, roomName } = data
+
+            try {
+                await deleteMessageService(messageId)
+                const messages = await getMessagesService(roomName)
+
+                io.to(roomName).emit('deleteMessage', {
+                    messages: messages,
+                })
+            } catch (error) {
+                socket.emit('error', { message: error })
+            }
+        })
+
+        socket.on('updateMessage', async (data) => {
+            const { messageId, content, roomName } = data
+
+            try {
+                await updateMessageService(messageId, content)
+                const messages = await getMessagesService(roomName)
+
+                io.to(roomName).emit('updateMessage', {
+                    messages: messages,
                 })
             } catch (error) {
                 socket.emit('error', { message: error })

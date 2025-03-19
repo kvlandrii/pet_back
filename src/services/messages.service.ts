@@ -1,4 +1,4 @@
-import { createMessage, getMessagesForRoom } from '../repository/messages.repository'
+import { createMessage, deleteMessage, getMessagesForRoom, updateMessage } from '../repository/messages.repository'
 
 export const getMessagesService = async (roomName: string) => {
     try {
@@ -15,5 +15,21 @@ export const createMessageService = async (message: string, roomName: string, se
         return newMessage
     } catch (error) {
         throw new Error(`Error creating messages: ${error instanceof Error ? error.message : String(error)}`)
+    }
+}
+
+export const deleteMessageService = async (messageId: string) => {
+    try {
+        await deleteMessage(messageId)
+    } catch (error) {
+        throw new Error(`Error deleting message: ${error instanceof Error ? error.message : String(error)}`)
+    }
+}
+
+export const updateMessageService = async (messageId: string, content: string) => {
+    try {
+        await updateMessage(messageId, content)
+    } catch (error) {
+        throw new Error(`Error updating message: ${error instanceof Error ? error.message : String(error)}`)
     }
 }
