@@ -29,7 +29,7 @@ export const todoResolvers = {
             const user = checkAuth(context)
 
             try {
-                const todos = await Todo.find({ user: user.id })
+                const todos = await Todo.find({ user: user.id }).populate('user')
                 if (!todos) {
                     throw new ApolloError('No todos found', 'NOT_FOUND')
                 }
@@ -43,7 +43,7 @@ export const todoResolvers = {
             const user = checkAuth(context)
 
             try {
-                const todo = await Todo.findById(id)
+                const todo = await Todo.findById(id).populate('user')
                 if (!todo) {
                     throw new ApolloError('Todo not found', 'NOT_FOUND')
                 }
@@ -66,7 +66,7 @@ export const todoResolvers = {
                 if (!todo) {
                     throw new ApolloError('Failed to create todo', 'INTERNAL_SERVER_ERROR')
                 }
-                return todo
+                return todo.populate('user')
             } catch (error) {
                 throw new ApolloError(error instanceof Error ? error.message : 'Failed to create todo', 'INTERNAL_SERVER_ERROR')
             }
@@ -77,7 +77,7 @@ export const todoResolvers = {
             const { id, title, description, completed } = args.input
 
             try {
-                const todo = await Todo.findById(id)
+                const todo = await Todo.findById(id).populate('user')
                 if (!todo) {
                     throw new ApolloError('Todo not found', 'NOT_FOUND')
                 }
@@ -96,7 +96,7 @@ export const todoResolvers = {
             const user = checkAuth(context)
             const { id } = args
             try {
-                const todo = await Todo.findById(id)
+                const todo = await Todo.findById(id).populate('user')
                 if (!todo) {
                     throw new ApolloError('Todo not found', 'NOT_FOUND')
                 }

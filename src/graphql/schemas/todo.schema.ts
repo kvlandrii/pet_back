@@ -6,7 +6,7 @@ export const todoTypeDefs = gql`
         title: String!
         description: String!
         completed: Boolean!
-        user: ID!
+        user: User!
     }
 
     input CreateTodoInput {
