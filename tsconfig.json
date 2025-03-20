@@ -12,7 +12,13 @@
         "sourceMap": true,
         "resolveJsonModule": true,
         "allowJs": true,
-        "noUnusedLocals": true
+        "noUnusedLocals": true,
+        "noImplicitAny": false,
+        "baseUrl": "./",
+        "paths": {
+            "@/*": ["src/*"],
+            "express": ["./node_modules/@types/express"]
+        }
     },
     "include": ["src", "src/types"],
     "exclude": ["node_modules", "dist"]

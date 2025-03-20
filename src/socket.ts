@@ -1,7 +1,7 @@
 import { Server } from 'socket.io'
 import { config } from './config/env'
 import { createMessageService, deleteMessageService, getMessagesService, updateMessageService } from './services/messages.service'
-import { verifyToken } from './utils/token'
+import { verifyToken } from './utils/verifyToken'
 import { getUserById } from './repository/user.repository'
 
 // eslint-disable-next-line

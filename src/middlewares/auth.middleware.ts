@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { Unauthorized } from 'http-errors'
 import { getUserById } from '../repository/user.repository'
-import { verifyToken } from '../utils/token'
+import { verifyToken } from '../utils/verifyToken'
 
 export const authMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization
@@ -15,7 +15,7 @@ export const authMiddleware = async (req: Request, _res: Response, next: NextFun
     }
 
     try {
-        const decoded = verifyToken(token)
+        const decoded = await verifyToken(token)
         const user = await getUserById(decoded.id)
 
         if (!user) {
@@ -24,8 +24,7 @@ export const authMiddleware = async (req: Request, _res: Response, next: NextFun
 
         req.user = user
         next()
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
         return next(new Unauthorized('Invalid token'))
     }
 }

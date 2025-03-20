@@ -1,15 +1,36 @@
 import { config } from './config/env'
-import app from './app'
 import { connectDB } from './config/db'
 import { createServer } from 'http'
 import { socket } from './socket'
+import { ApolloServer } from 'apollo-server-express'
+import app from './app'
+import { authMiddleware } from './graphql/middlewares/auth.middleware'
+import { resolvers } from './graphql/resolvers'
+import { typeDefs } from './graphql/schemas'
 
-connectDB()
+const startServer = async () => {
+    connectDB()
 
-const httpServer = createServer(app)
+    const apolloServer = new ApolloServer({
+        typeDefs,
+        resolvers,
+        context: authMiddleware,
+    })
 
-socket(httpServer)
+    await apolloServer.start()
+    apolloServer.applyMiddleware({ app, path: '/graphql' })
 
-httpServer.listen(config.port, () => {
-    console.log(`REST and SOCKET server running on http://localhost:${config.port}`)
+    const httpServer = createServer(app)
+
+    socket(httpServer)
+
+    httpServer.listen(config.port, () => {
+        console.log(`GraphQL server running on http://localhost:${config.port}/graphql`)
+        console.log(`REST API running on http://localhost:${config.port}/api`)
+        console.log(`WebSocket server running on http://localhost:${config.port}`)
+    })
+}
+
+startServer().catch((error) => {
+    console.error(error)
 })
