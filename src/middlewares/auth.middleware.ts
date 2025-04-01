@@ -15,7 +15,7 @@ export const authMiddleware = async (req: Request, _res: Response, next: NextFun
     }
 
     try {
-        const decoded = await verifyToken(token)
+        const decoded = verifyToken(token)
         const user = await getUserById(decoded.id)
 
         if (!user) {

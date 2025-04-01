@@ -8,7 +8,7 @@ export const authMiddleware = async (context: any) => {
         throw new ApolloError('Authorization header must be provided', 'UNAUTHORIZED')
     }
 
-    const token = authHeader.split('Bearer ')[1]
+    const token = authHeader.split(' ')[1]
     if (!token) {
         throw new ApolloError("Authentication token must be 'Bearer [token]'", 'UNAUTHORIZED')
     }
