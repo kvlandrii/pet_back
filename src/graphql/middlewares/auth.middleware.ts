@@ -1,27 +1,27 @@
-import { User } from '@/models/user.model'
+import { getUserById } from '@/repository/user.repository'
 import { verifyToken } from '@/utils/verifyToken'
+import { ApolloError } from 'apollo-server-errors'
 
-export const authMiddleware = async ({ req }) => {
-    const headerToken = req.headers.authorization || ''
-    if (!headerToken) {
-        throw new Error('No authorization header provided')
+export const authMiddleware = async (context: any) => {
+    const authHeader = context.req.headers.authorization
+    if (!authHeader) {
+        throw new ApolloError('Authorization header must be provided', 'UNAUTHORIZED')
     }
 
-    const token = headerToken.split(' ')[1]
+    const token = authHeader.split('Bearer ')[1]
     if (!token) {
-        throw new Error('No token provided')
+        throw new ApolloError("Authentication token must be 'Bearer [token]'", 'UNAUTHORIZED')
     }
 
     try {
         const decoded = verifyToken(token)
-        const user = await User.findById(decoded.id)
+        const user = await getUserById(decoded.id)
 
         if (!user) {
-            throw new Error('User not found')
+            return new ApolloError('User not found', 'UNAUTHORIZED')
         }
-
-        return { user }
-    } catch (error: any) {
-        throw new Error(error)
+        return user
+    } catch (err) {
+        throw new ApolloError('Invalid/Expired token', 'UNAUTHORIZED')
     }
 }

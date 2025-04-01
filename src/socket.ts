@@ -1,14 +1,12 @@
 import { Server } from 'socket.io'
-import { config } from './config/env'
 import { createMessageService, deleteMessageService, getMessagesService, updateMessageService } from './services/messages.service'
 import { verifyToken } from './utils/verifyToken'
 import { getUserById } from './repository/user.repository'
 
-// eslint-disable-next-line
 export const socket = (httpServer: any) => {
     const io = new Server(httpServer, {
         cors: {
-            origin: config.corsOrigin,
+            origin: '*',
             methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
             credentials: true,
             allowedHeaders: ['Content-Type', 'Authorization'],

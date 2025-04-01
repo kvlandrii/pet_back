@@ -3,7 +3,6 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import routes from './routes'
 import cookiesParser from 'cookie-parser'
-import { config } from './config/env'
 
 dotenv.config()
 
@@ -11,7 +10,7 @@ const app = express()
 
 app.use(
     cors({
-        origin: config.corsOrigin,
+        origin: '*',
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],

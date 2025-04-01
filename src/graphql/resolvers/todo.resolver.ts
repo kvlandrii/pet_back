@@ -1,6 +1,6 @@
 import { Todo } from '@/models/todos.model'
 import { ApolloError } from 'apollo-server-express'
-import { checkAuth } from '../utils/checkAuth'
+import { authMiddleware } from '../middlewares/auth.middleware'
 
 type CreateTodoInput = {
     input: {
@@ -26,7 +26,7 @@ type DeleteTodoInput = {
 export const todoResolvers = {
     Query: {
         getTodosQuery: async (_: any, __: any, context: any) => {
-            const user = checkAuth(context)
+            const user = await authMiddleware(context)
 
             try {
                 const todos = await Todo.find({ user: user.id }).populate('user')
@@ -40,7 +40,7 @@ export const todoResolvers = {
         },
 
         getTodoByIdQuery: async (_: any, { id }: { id: string }, context: any) => {
-            const user = checkAuth(context)
+            const user = await authMiddleware(context)
 
             try {
                 const todo = await Todo.findById(id).populate('user')
@@ -58,7 +58,7 @@ export const todoResolvers = {
     },
     Mutation: {
         createTodoMutation: async (_: any, args: CreateTodoInput, context: any) => {
-            const user = checkAuth(context)
+            const user = await authMiddleware(context)
             const { title, description, completed } = args.input
 
             try {
@@ -73,7 +73,8 @@ export const todoResolvers = {
         },
 
         updateTodoMutation: async (_: any, args: UpdateTodoInput, context: any) => {
-            const user = checkAuth(context)
+            const user = await authMiddleware(context)
+
             const { id, title, description, completed } = args.input
 
             try {
@@ -93,7 +94,8 @@ export const todoResolvers = {
         },
 
         deleteTodoMutation: async (_: any, args: DeleteTodoInput, context: any) => {
-            const user = checkAuth(context)
+            const user = await authMiddleware(context)
+
             const { id } = args
             try {
                 const todo = await Todo.findById(id).populate('user')

@@ -3,7 +3,7 @@ import { User } from '../../models/user.model'
 import { ApolloError, UserInputError } from 'apollo-server-errors'
 import { config } from '@/config/env'
 import bcrypt from 'bcrypt'
-import { checkAuth } from '../utils/checkAuth'
+import { authMiddleware } from '../middlewares/auth.middleware'
 
 type LoginUserInput = {
     input: {
@@ -23,7 +23,7 @@ type RegisterUserInput = {
 export const userResolvers = {
     Query: {
         getUsersQuery: async (_: any, __: any, context: any) => {
-            checkAuth(context)
+            await authMiddleware(context)
 
             try {
                 const users = await User.find()
@@ -37,7 +37,7 @@ export const userResolvers = {
         },
 
         getUserByIdQuery: async (_: any, { id }: { id: string }, context: any) => {
-            checkAuth(context)
+            await authMiddleware(context)
 
             try {
                 const user = await User.findById(id)
@@ -51,7 +51,7 @@ export const userResolvers = {
         },
 
         getMeQuery: async (_: any, __: any, context: any) => {
-            const user = checkAuth(context)
+            const user = await authMiddleware(context)
 
             try {
                 const currentUser = await User.findById(user.id)
@@ -97,8 +97,9 @@ export const userResolvers = {
             }
         },
 
-        loginUserMutation: async (_: any, args: LoginUserInput) => {
+        loginUserMutation: async (_: any, args: LoginUserInput, context) => {
             const { email, password } = args.input
+
             try {
                 if (!email || !password) {
                     throw new UserInputError('Email and password are required')
