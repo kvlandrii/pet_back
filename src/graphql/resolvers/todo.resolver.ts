@@ -47,7 +47,7 @@ export const todoResolvers = {
                 if (!todo) {
                     throw new ApolloError('Todo not found', 'NOT_FOUND')
                 }
-                if (todo.user?.toString() !== user.id) {
+                if (todo.user?.id.toString() !== user.id) {
                     throw new ApolloError('Unauthorized access', 'UNAUTHORIZED')
                 }
                 return todo
@@ -82,7 +82,7 @@ export const todoResolvers = {
                 if (!todo) {
                     throw new ApolloError('Todo not found', 'NOT_FOUND')
                 }
-                if (todo.user?.toString() !== user.id) {
+                if (todo.user?.id.toString() !== user.id) {
                     throw new ApolloError('Unauthorized access', 'UNAUTHORIZED')
                 }
 
@@ -102,7 +102,8 @@ export const todoResolvers = {
                 if (!todo) {
                     throw new ApolloError('Todo not found', 'NOT_FOUND')
                 }
-                if (todo.user?.toString() !== user.id) {
+
+                if (todo.user?.id.toString() !== user.id) {
                     throw new ApolloError('Unauthorized access', 'UNAUTHORIZED')
                 }
 
