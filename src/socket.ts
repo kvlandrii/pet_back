@@ -15,19 +15,25 @@ export const socket = (httpServer: any) => {
 
     io.use(async (socket, next) => {
         try {
-            const token = socket.handshake.auth?.token
+            const token = socket.handshake.auth?.token.split(' ')[1]
 
             if (!token) {
+                console.error('No token provided')
                 return next(new Error('No token provided'))
             }
 
             const decoded = verifyToken(token)
+
             const user = await getUserById(decoded.id)
+            if (!user) {
+                console.error('User not found')
+                return next(new Error('User not found'))
+            }
 
             socket.data.user = user
-
             next()
         } catch (err) {
+            console.error('Authentication error:', err)
             next(new Error('Authentication error: ' + err))
         }
     })
