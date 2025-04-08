@@ -97,6 +97,30 @@ export const socket = (httpServer: any) => {
                 socket.emit('error', { message: error })
             }
         })
+
+        socket.on('joinCall', (data) => {
+            const { partnerId } = data
+            const userId = socket.data.user.id
+            const roomName = [userId, partnerId].sort().join('-')
+
+            socket.join(roomName)
+            socket.emit('joinedCall', { roomName })
+        })
+
+        socket.on('offer', (data) => {
+            const { offer, roomName } = data
+            socket.to(roomName).emit('offer', { offer })
+        })
+
+        socket.on('answer', (data) => {
+            const { answer, roomName } = data
+            socket.to(roomName).emit('answer', { answer })
+        })
+
+        socket.on('iceCandidate', (data) => {
+            const { candidate, roomName } = data
+            socket.to(roomName).emit('iceCandidate', { candidate })
+        })
     })
 
     return io
